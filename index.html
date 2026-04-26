@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>skywelc — Сравнение аппаратов</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            spark: {
+              50: '#fff9eb',
+              100: '#ffefc6',
+              200: '#ffdc88',
+              300: '#ffc44a',
+              400: '#ffab20',
+              500: '#f98a07',
+              600: '#dd6402',
+              700: '#b74306',
+              800: '#94330c',
+              900: '#7a2b0d',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #1a1a2e; }
+    ::-webkit-scrollbar-thumb { background: #f98a07; border-radius: 4px; }
+
+    .card-glow:hover {
+      box-shadow: 0 0 40px rgba(249, 138, 7, 0.15), 0 0 80px rgba(249, 138, 7, 0.05);
+    }
+
+    .specs-panel {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+      opacity: 0;
+    }
+
+    .specs-panel.open {
+      max-height: 800px;
+      opacity: 1;
+    }
+
+    .btn-arrow {
+      transition: transform 0.3s ease;
+    }
+
+    .btn-arrow.rotated {
+      transform: rotate(180deg);
+    }
+
+    .hero-spark {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #ffc44a;
+      border-radius: 50%;
+      animation: sparkFly 2s ease-out infinite;
+      box-shadow: 0 0 6px #ffab20, 0 0 12px #f98a07;
+    }
+
+    @keyframes sparkFly {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-80px) scale(0); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .float-anim {
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse-ring {
+      0% { transform: scale(1); opacity: 0.5; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
+
+    .pulse-ring::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: inherit;
+      border: 2px solid currentColor;
+      animation: pulse-ring 2s ease-out infinite;
+    }
+
+    .spec-row {
+      transform: translateX(-10px);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .specs-panel.open .spec-row {
+      transform: translateX(0);
+      opacity: 1;
+    }
+
+    .specs-panel.open .spec-row:nth-child(1) { transition-delay: 0.05s; }
+    .specs-panel.open .spec-row:nth-child(2) { transition-delay: 0.1s; }
+    .specs-panel.open .spec-row:nth-child(3) { transition-delay: 0.15s; }
+    .specs-panel.open .spec-row:nth-child(4) { transition-delay: 0.2s; }
+    .specs-panel.open .spec-row:nth-child(5) { transition-delay: 0.25s; }
+    .specs-panel.open .spec-row:nth-child(6) { transition-delay: 0.3s; }
+    .specs-panel.open .spec-row:nth-child(7) { transition-delay: 0.35s; }
+    .specs-panel.open .spec-row:nth-child(8) { transition-delay: 0.4s; }
+    .specs-panel.open .spec-row:nth-child(9) { transition-delay: 0.45s; }
+    .specs-panel.open .spec-row:nth-child(10) { transition-delay: 0.5s; }
+  </style>
+</head>
+<body class="bg-[#0d0d1a] text-white font-sans min-h-screen">
+
+  <!-- Hero Section -->
+  <header class="relative overflow-hidden">
+    <!-- Background Effects -->
+    <div class="absolute inset-0 bg-gradient-to-b from-spark-900/30 via-transparent to-transparent"></div>
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-spark-600/5 rounded-full blur-3xl"></div>
+    <div class="absolute top-20 left-10 w-2 h-2 bg-spark-400 rounded-full hero-spark" style="animation-delay: 0s;"></div>
+    <div class="absolute top-32 left-1/4 w-1.5 h-1.5 bg-spark-300 rounded-full hero-spark" style="animation-delay: 0.5s;"></div>
+    <div class="absolute top-16 right-1/3 w-2 h-2 bg-spark-400 rounded-full hero-spark" style="animation-delay: 1s;"></div>
+    <div class="absolute top-28 right-20 w-1 h-1 bg-spark-500 rounded-full hero-spark" style="animation-delay: 1.5s;"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+      <!-- Nav -->
+      <nav class="flex items-center justify-between mb-16">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-gradient-to-br from-spark-400 to-spark-600 rounded-lg flex items-center justify-center">
+            <i data-lucide="flame" class="w-5 h-5 text-white"></i>
+          </div>
+          <span class="text-xl font-bold tracking-tight">skywelc<span class="text-spark-400">-corp.</span></span>
+        </div>
+        <div class="hidden md:flex items-center gap-8 text-sm text-gray-400">
+          <a href="#compare" class="hover:text-spark-400 transition-colors">Сравнение</a>
+        
+        </div>
+      </nav>
+
+      <!-- Hero Content -->
+      <div class="text-center max-w-3xl mx-auto mb-8">
+        <div class="inline-flex items-center gap-2 bg-spark-600/10 border border-spark-600/20 rounded-full px-4 py-1.5 mb-6">
+          <i data-lucide="zap" class="w-3.5 h-3.5 text-spark-400"></i>
+          <span class="text-xs font-medium text-spark-300 tracking-wide uppercase">Подберите свой аппарат</span>
+        </div>
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight mb-6 leading-tight">
+          Мир <span class="text-transparent bg-clip-text bg-gradient-to-r from-spark-300 via-spark-400 to-spark-600">сварочных аппаратов</span>
+        </h1>
+        <p class="text-gray-400 text-lg leading-relaxed max-w-2xl mx-auto">
+          Данный сайт представляет собой выбор сварочных аппаратов, под ваши задачи — от первых шагов в сварке до профессиональной работы каждый день
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Comparison Section -->
+  <main id="compare" class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+
+    <!-- Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+
+      <!-- Card 1: Beginner -->
+      <div class="card-glow relative bg-gradient-to-b from-[#161628] to-[#111122] border border-white/5 rounded-2xl overflow-hidden transition-all duration-500 hover:border-spark-500/30 group">
+        <!-- Badge -->
+        <div class="absolute top-4 right-4 z-10">
+          <div class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
+            Новичок
+          </div>
+        </div>
+
+        <!-- Top Gradient Line -->
+        <div class="h-1 bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400"></div>
+
+        <div class="p-6 lg:p-8">
+          <!-- Icon + Title -->
+          <div class="flex items-center gap-4 mb-6">
+            <div class="relative w-14 h-14 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center justify-center shrink-0 float-anim">
+              <i data-lucide="sprout" class="w-7 h-7 text-emerald-400"></i>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold leading-tight">Fubag IR 200</h2>
+              <p class="text-emerald-400 text-sm font-medium">Для новичков</p>
+            </div>
+          </div>
+
+          <!-- Image -->
+          <div class="relative mb-6 rounded-xl overflow-hidden bg-[#0a0a18] border border-white/5">
+            <img src="https://avatars.mds.yandex.net/i?id=a6b1f998e43c394e00b1c8cc3b00a0beddb9bda5-5859188-images-thumbs&n=13" alt="Сварочный аппарат для новичков" class="w-full h-48 object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500">
+            <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a18] via-transparent to-transparent"></div>
+          </div>
+
+          <!-- Brief Specs -->
+          <div class="space-y-3 mb-6">
+            <div class="flex items-center justify-between py-2 border-b border-white/5">
+              <span class="text-gray-500 text-sm flex items-center gap-2">
+                <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+                Ток сварки
+              </span>
+              <span class="text-white font-semibold text-sm">10–200 А</span>
+            </div>
+            <div class="flex items-center justify-between py-2 border-b border-white/5">
+              <span class="text-gray-500 text-sm flex items-center gap-2">
+                <i data-lucide="plug" class="w-3.5 h-3.5"></i>
+                Питание
+              </span>
+              <span class="text-white font-semibold text-sm">220 В</span>
+            </div>
+            <div class="flex items-center justify-between py-2 border-b border-white/5">
+              <span class="text-gray-500 text-sm flex items-center gap-2">
+                <i data-lucide="scale" class="w-3.5 h-3.5"></i>
+                Вес
+              </span>
+              <span class="text-white font-semibold text-sm">4.8 кг</span>
+            </div>
+            <div class="flex items-center justify-between py-2">
+              <span class="text-gray-500 text-sm flex items-center gap-2">
+                <i data-lucide="tag" class="w-3.5 h-3.5"></i>
+                Цена
+              </span>
+              <span class="text-emerald-400 font-bold">9.350 ₽</span>
+            </div>
+          </div>
+
+          <!-- Expand Button -->
+          <button onclick="toggleSpecs('beginner')" class="w-full flex items-center justify-center gap-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 hover:border-emerald-500/40 text-emerald-400 font-semibold text-sm py-3 px-4 rounded-xl transition-all duration-300 relative overflow-hidden group/btn">
+            <span id="beginner-btn-text">Подробные характеристики</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 btn-arrow" id="beginner-arrow"></i>
+          </button>
+
+          <!-- Detailed Specs Panel -->
+          <div id="beginner-specs" class="specs-panel">
+            <div class="pt-6 space-y-0">
+              <div class="spec-row flex items-center justify-between py-2.5 border-b border-white/5">
+                <span class="text-gray-500 text-sm">Тип аппарата</span>
+                <span class="text-white text-sm font-medium">Инверторный (ММА)</span>
+              </div>
+              <div class="spec-row flex items-center justify-between py-2.5 border-b border-white/5">
+                <span class="text-gray-500 text-sm">Сварочный ток (ММА)</span>
+                <span class="text-white text-sm font-medium">10–200 А</span>
+              </div>
+              <div class="spec-row flex items-center justify-between py-2.5 border-b border-white/5">
+                <span class="text-gray-500 text-sm">Напряжение холостого хода</span>
+                <span class="text-white text-sm font-medium">64 В</span>
+              </div>
+              <div class="spec-row flex items-center justify-between py-2.5 border-b border-white/5">
+                <span class="text-gray-500 text-sm">ПВ при 200А</span>
+                <span class="text-white text-sm font-medium">40%</span>
+              </div>
+              <div class="spec-row flex items-center justify-between py-2.5 border-b border-white/5">
+                <span class="text-gray-500 text-sm">Диаметр электрода</span>
+                <span class="text-white text-sm font-medium">1.6–4.0 мм</span>
+              </div>
+              <div class="spec-row flex items-center justify-between py-2.5 border-b border-white/5">
+                <span class="text-gray-500 text-sm">Класс защиты</span>
+                <span class="text-white text-sm font-medium">IP21S</span>
+              </div>
+              <div class="spec-row flex items-center justify-between py-2.5 border-b border-white/5">
+                <span class="text-gray-500 text-sm">Габариты</span>
+                <span class="text-white text-sm font-medium">310×130×250 мм</span>
+              </div>
+              <div class="spec-row flex items-center justify-between py-2.5 border-b border-white/5">
+                <span class="text-gray-500 text-sm">Антиприлипание</span>
+                <span class="text-emerald-400 text-sm font-medium">Да (Anti-Stick)</span>
+              </div>
+              <div class="spec-row flex items-center justify-between py-2.5 border-b border-white/5">
+                <span class="text-gray-500 text-sm">Горячий старт</span>
+                <span class="text-emerald-400 text-sm font-medium">Да (Hot Start)</span>
+              </div>
+              <div class="spec-row flex items-center justify-between py-2.5">
+                <span class="text-gray-500 text-sm">Дисплей</span>
+                <span class="text-white text-sm font-medium">Цифровой</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Professional -->
+      <div class="card-glow relative bg-gradient-to-b from-[#161628] to-[#111122] border border-white/5 rounded-2xl overflow-hidden transition-all duration-500 hover:border-spark-500/30 group md:-mt-4 md:mb-4">
+        <!-- Popular Badge -->
+        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-spark-500 via-spark-400 to-yellow-400"></div>
+        <div class="absolute top-4 right-4 z-10">
+          <div class="bg-spark-500/10 border border-spark-500/30 text-spark-400 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full relative pulse-ring">
+            Профи
+          </div>
+        </div>
+
+        <div class="p-6 lg:p-8">
+          <!-- Icon + Title -->
+          <div class="flex items-center gap-4 mb-6">
+            <div class="relative w-14 h-14 bg-spark-500/10 border border-spark-500/20 rounded-xl flex items-center justify-center shrink-0 float-anim" style="animation-delay: 0.5s;">
+              <i data-lucide="shield-check" class="w-7 h-7 text-spark-400"></i>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold leading-tight">Kemppi MinarcMMA 220</h2>
+              <p class="text-spark-400 text-sm font-medium">Для профессионалов</p>
+            </div>
+          </div>
+
+          <!-- Image -->
+          <div class="relative mb-6 rounded-xl overflow-hidden bg-[#0a0a18] border border-white/5">
+            <img src="https://avatars.mds.yandex.net/i?id=599b258e39df4974ce4e8c758de1c39d36e9e6aa-6419094-images-thumbs&n=13" alt="Сварочный аппарат для профессионалов" class="w-full h-48 object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500">
+            <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a18] via-transparent to-transparent"></div>
+          </div>
+
+          <!-- Brief Specs -->
+          <div class="space-y-3 mb-6">
+            <div class="flex items-center justify-between py-2 border-b border-white/5">
+              <span class="text-gray-500 text-sm flex items-center gap-2">
+                <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+                Ток сварки
+              </span>
+              <span class="text-white font-semibold text-sm">5–220 А</span>
+            </div>
+            <div class="flex items-center justify-between py-2 border-b border-white/5">
+              <span class="text-gray-500 text-sm flex items-center gap-2">
+                <i data-lucide="plug" class="w-3.5 h-3.5"></i>
+                Питание
+              </span>
+              <span class="text-white font-semibold text-sm">220 / 380 В</span>
+            </div>
+            <div class="flex items-center justify-between py-2 border-b border-white/5">
+              <span class="text-gray-500 text-sm flex items-center gap-2">
+                <i data-lucide="scale" class="w-3.5 h-3.5"></i>
+                Вес
+              </span>
+              <span class="text-white font-semibold text-sm">7.2 кг</span>
+            </div>
+            <div class="flex items-center justify-between py-2">
+              <span class="text-gray-500 text-sm flex items-center gap-2">
+                <i data-lucide="tag" class="w-3.5 h-3.5"></i>
+                Цена
+              </span>
+              <span class="text-spark-400 font-bold">185.000 ₽</span>
+            </div>
+          </div>
+
+          <!-- Expand Button -->
+          <button onclick="toggleSpecs('pro')" class="w-full flex items-center justify-center gap-2 bg-spark-500/10 hover:bg-spark-500/20 border border-spark-500/20 hover:border-spark-500/40 text-spark-400 font-semibold text-sm py-3 px-4 rounded-xl transition-all duration-300 relative overflow-hidden">
+            <span id="pro-btn-text">Подробные характеристики</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 btn-arrow" id="pro-arrow"></i>
+          </button>
+
+          <!-- Detailed Specs Panel -->
+          <div id="pro-specs" class="specs-panel">
+            <div class="pt-6 space-y-0">
+              <div class="spec-row flex items-center justify-between py-2.5 border-b border-white/5">
+                <span class="text-gray-500 text-sm">Тип аппарата</span>
+                <span class="text-white text-sm font-medium">Инверторный (ММА / TIG)</span>
+              </div>
+              <div class="spec-row flex items-center justify-between py-2.5 border-b border-white/5">
+                <span class="text-gray-500 text-sm">Сварочный ток (ММА)</span>
+                <span class="text-white text-sm font-medium">5–220 А</span>
+              </div>
+              <div class="spec-row flex items-center justify-between py-2.5 border-b border-white/5">
+                <span class="text-gray-500 text-sm">Сварочный ток (TIG)</span>
+                <span class="text-white text-sm font-medium">5–200 А</span>
+              </div>
+              <div class="spec-row flex items-center justify-between py-2.5 border-b border-white/5">
+                <span class="text-gray-500 text-sm">Напряжение холостого хода</span>
+                <span class="text-white text-sm font-medium">72 В</span>
+              </div>
+              <div class="spec-row flex items-center justify-between py-2.5 border-b border-white/5">
+                <span class="text-gray-500 text-sm">ПВ при 220А</span>
+                <span class="text-white text-sm font-medium">35% / 60% при 170А</span>
+              </div>
+              <div class="spec-row flex items-center justify-between py-2.5 border-b border-white/5">
+                <span class="text-gray-500 text-sm">Диаметр электрода</span>
+                <span class="text-white text-sm font-medium">1.0–5.0 мм</span>
+              </div>
+              <div class="spec-row flex items-center justify-between py-2.5 border-b border-white/5">
+                <span class="text-gray-500 text-sm">Класс защиты</span>
+                <span class="text-white text-sm font-medium">IP23S</span>
+              </div>
+              <div class="spec-row flex items-center justify-between py-2.5 border-b border-white/5">
+                <span class="text-gray-500 text-sm">Габариты</span>
+                <span class="text-white text-sm font-medium">370×155×290 мм</span>
+              </div>
+              <div class="spec-row flex items-center justify-between py-2.5 border-b border-white/5">
+                <span class="text-gray-500 text-sm">Arc Force</span>
+                <span class="text-spark-400 text-sm font-medium">Регулируемый</span>
+              </div>
+              <div class="spec-row flex items-center justify-between py-2.5">
+                <span class="text-gray-500 text-sm">Пульт ДУ</span>
+                <span class="text-spark-400 text-sm font-medium">Опция</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Home/Hobby -->
+      <div class="card-glow relative bg-gradient-to-b from-[#161628] to-[#111122] border border-white/5 rounded-2xl overflow-hidden transition-all duration-500 hover:border-blue-500/30 group">
+        <!-- Top Gradient Line -->
+        <div class="h-1 bg-gradient-to-r from-blue-500 via-blue-400 to-cyan-400"></div>
+
+        <div class="absolute top-4 right-4 z-10">
+          <div class="bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
+            Дом
+          </div>
+        </div>
+
+        <div class="p-6 lg:p-8">
+          <!-- Icon + Title -->
+          <div class="flex items-center gap-4 mb-6">
+            <div class="relative w-14 h-14 bg-blue-500/10 border border-blue-500/20 rounded-xl flex items-center justify-center shrink-0 float-anim" style="animation-delay: 1s;">
+              <i data-lucide="home" class="w-7 h-7 text-blue-400"></i>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold leading-tight">Ресанта САИ-190К</h2>
+              <p class="text-blue-400 text-sm font-medium">Для дома и дачи</p>
+            </div>
+          </div>
+
+          <!-- Image -->
+          <div class="relative mb-6 rounded-xl overflow-hidden bg-[#0a0a18] border border-white/5">
+            <img src="https://avatars.mds.yandex.net/i?id=e61372377f5753dbefadc2f7ce64c57ad2d52331-4634814-images-thumbs&n=13" alt="Сварочный аппарат для дома" class="w-full h-48 object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500">
+            <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a18] via-transparent to-transparent"></div>
+          </div>
+
+          <!-- Brief Specs -->
+          <div class="space-y-3 mb-6">
+            <div class="flex items-center justify-between py-2 border-b border-white/5">
+              <span class="text-gray-500 text-sm flex items-center gap-2">
+                <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+                Ток сварки
+              </span>
+              <span class="text-white font-semibold text-sm">10–190 А</span>
+            </div>
+            <div class="flex items-center justify-between py-2 border-b border-white/5">
+              <span class="text-gray-500 text-sm flex items-center gap-2">
+                <i data-lucide="plug" class="w-3.5 h-3.5"></i>
+                Питание
+              </span>
+              <span class="text-white font-semibold text-sm">220 В</span>
+            </div>
+            <div class="flex items-center justify-between py-2 border-b border-white/5">
+              <span class="text-gray-500 text-sm flex items-center gap-2">
+                <i data-lucide="scale" class="w-3.5 h-3.5"></i>
+                Вес
+              </span>
+              <span class="text-white font-semibold text-sm">4.2 кг</span>
+            </div>
+            <div class="flex items-center justify-between py-2">
+              <span class="text-gray-500 text-sm flex items-center gap-2">
+                <i data-lucide="tag" class="w-3.5 h-3.5"></i>
+                Цена
+              </span>
+              <span class="text-blue-400 font-bold">~6 200 ₽</span>
+            </div>
+          </div>
+
+          <!-- Expand Button -->
+          <button onclick="toggleSpecs('home')" class="w-full flex items-center justify-center gap-2 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 hover:border-blue-500/40 text-blue-400 font-semibold text-sm py-3 px-4 rounded-xl transition-all duration-300 relative overflow-hidden">
+            <span id="home-btn-text">Подробные характеристики</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 btn-arrow" id="home-arrow"></i>
+          </button>
+
+          <!-- Detailed Specs Panel -->
+          <div id="home-specs" class="specs-panel">
+            <div class="pt-6 space-y-0">
+              <div class="spec-row flex items-center justify-between py-2.5 border-b border-white/5">
+                <span class="text-gray-500 text-sm">Тип аппарата</span>
+                <span class="text-white text-sm font-medium">Инверторный (ММА)</span>
+              </div>
+              <div class="spec-row flex items-center justify-between py-2.5 border-b border-white/5">
+                <span class="text-gray-500 text-sm">Сварочный ток (ММА)</span>
+                <span class="text-white text-sm font-medium">10–190 А</span>
+              </div>
+              <div class="spec-row flex items-center justify-between py-2.5 border-b border-white/5">
+                <span class="text-gray-500 text-sm">Напряжение холостого хода</span>
+                <span class="text-white text-sm font-medium">62 В</span>
+              </div>
+              <div class="spec-row flex items-center justify-between py-2.5 border-b border-white/5">
+                <span class="text-gray-500 text-sm">ПВ при 190А</span>
+                <span class="text-white text-sm font-medium">30%</span>
+              </div>
+              <div class="spec-row flex items-center justify-between py-2.5 border-b border-white/5">
+                <span class="text-gray-500 text-sm">Диаметр электрода</span>
+                <span class="text-white text-sm font-medium">1.6–4.0 мм</span>
+              </div>
+              <div class="spec-row flex items-center justify-between py-2.5 border-b border-white/5">
+                <span class="text-gray-500 text-sm">Класс защиты</span>
+                <span class="text-white text-sm font-medium">IP21</span>
+              </div>
+              <div class="spec-row flex items-center justify-between py-2.5 border-b border-white/5">
+                <span class="text-gray-500 text-sm">Габариты</span>
+                <span class="text-white text-sm font-medium">260×125×210 мм</span>
+              </div>
+              <div class="spec-row flex items-center justify-between py-2.5 border-b border-white/5">
+                <span class="text-gray-500 text-sm">Антиприлипание</span>
+                <span class="text-blue-400 text-sm font-medium">Да (Anti-Stick)</span>
+              </div>
+              <div class="spec-row flex items-center justify-between py-2.5 border-b border-white/5">
+                <span class="text-gray-500 text-sm">Горячий старт</span>
+                <span class="text-blue-400 text-sm font-medium">Да (Hot Start)</span>
+              </div>
+              <div class="spec-row flex items-center justify-between py-2.5">
+                <span class="text-gray-500 text-sm">Форсаж дуги</span>
+                <span class="text-blue-400 text-sm font-medium">Да (Arc Force)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Comparison Tip -->
+    <div class="mt-16 text-center">
+      <div class="inline-flex items-center gap-3 bg-white/[0.02] border border-white/5 rounded-2xl px-6 py-4">
+        <i data-lucide="info" class="w-5 h-5 text-spark-500 shrink-0"></i>
+        <p class="text-gray-500 text-sm leading-relaxed">
+          Нажмите <span class="text-white font-medium">«Подробные характеристики»</span>, чтобы развернуть полный список параметров каждого аппарата
+        </p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/5 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2 text-gray-600 text-sm">
+        <i data-lucide="flame" class="w-4 h-4 text-spark-600"></i>
+        <span>skywelc-corp. © 2026</span>
+      </div>
+      <p class="text-gray-700 text-xs">Все характеристики приведены для ознакомления</p>
+    </div>
+  </footer>
+
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Toggle specs panel
+    function toggleSpecs(id) {
+      const panel = document.getElementById(`${id}-specs`);
+      const arrow = document.getElementById(`${id}-arrow`);
+      const btnText = document.getElementById(`${id}-btn-text`);
+
+      const isOpen = panel.classList.contains('open');
+
+      if (isOpen) {
+        panel.classList.remove('open');
+        arrow.classList.remove('rotated');
+        btnText.textContent = 'Подробные характеристики';
+      } else {
+        panel.classList.add('open');
+        arrow.classList.add('rotated');
+        btnText.textContent = 'Свернуть характеристики';
+      }
+    }
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
